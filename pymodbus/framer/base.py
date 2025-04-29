@@ -67,6 +67,9 @@ class FramerBase:
         """Process incoming data."""
         used_len = 0
         while True:
+            if used_len >= len(data):
+                return used_len, None
+            Log.debug("Processing: {}", data, ":hex")
             data_len, pdu = self._processIncomingFrame(data[used_len:])
             used_len += data_len
             if not data_len:
@@ -76,9 +79,6 @@ class FramerBase:
 
     def _processIncomingFrame(self, data: bytes) -> tuple[int, ModbusPDU | None]:
         """Assemble PDU."""
-        Log.debug("Processing: {}", data, ":hex")
-        if not data:
-            return 0, None
         used_len, dev_id, tid, frame_data = self.decode(data)
         if not frame_data:
             return used_len, None
